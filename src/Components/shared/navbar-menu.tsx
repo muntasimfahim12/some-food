@@ -4,33 +4,24 @@ import React, { useState } from "react";
 import { motion, Transition } from "framer-motion";
 import Link from "next/link";
 
-// ========================
-// Utility function
-// ========================
-function cn(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
+const transition: Transition = {
+  type: "spring",
+  mass: 2,
+  damping: 14,
+  stiffness: 120,
+  restDelta: 0.001,
+  restSpeed: 0.001,
+};
 
-// ========================
-// Navbar Component
-// ========================
-export default function NavbarDemo() {
-  return (
-    <div className="relative w-full min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navbar />
-      <main className="flex flex-col items-center justify-center mt-32 text-center px-4">
-        <h1 className="text-3xl font-bold text-black dark:text-white mb-4">
-          Welcome to SomeFood
-        </h1>
-        <p className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl">
-          Hover over items to see dropdowns. Click items to navigate instantly.
-        </p>
-      </main>
-    </div>
-  );
-}
+type MenuItemProps = {
+  setActive: (item: string) => void;
+  active: string | null;
+  item: string;
+  children?: React.ReactNode;
+  link?: string;
+};
 
-function Navbar() {
+export default function Navbar() {
   const [active, setActive] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
@@ -60,12 +51,8 @@ function Navbar() {
             <MenuItem setActive={setActive} active={active} item="Profile" link="/profile" />
             <MenuItem setActive={setActive} active={active} item="Services">
               <div className="flex flex-col space-y-2 text-sm p-2">
-                <Link href="/web-dev" className="hover:text-red-500">
-                  Web Development
-                </Link>
-                <Link href="/interface-design" className="hover:text-red-500">
-                  Interface Design
-                </Link>
+                <Link href="/web-dev" className="hover:text-red-500">Web Development</Link>
+                <Link href="/interface-design" className="hover:text-red-500">Interface Design</Link>
               </div>
             </MenuItem>
             <MenuItem setActive={setActive} active={active} item="Products">
@@ -99,103 +86,49 @@ function Navbar() {
   );
 }
 
-// ========================
-// Motion & Menu Components
-// ========================
-const transition: Transition = {
-  type: "spring",
-  mass: 2,
-  damping: 14,
-  stiffness: 120,
-  restDelta: 0.001,
-  restSpeed: 0.001,
-};
+const MenuItem = ({ setActive, active, item, children, link }: MenuItemProps) => (
+  <div onMouseEnter={() => setActive(item)} className="relative cursor-pointer">
+    {link ? (
+      <Link
+        href={link}
+        className="text-black dark:text-white hover:text-red-500 font-medium"
+      >
+        {item}
+      </Link>
+    ) : (
+      <motion.p transition={{ duration: 0.25 }} className="text-black dark:text-white hover:text-red-500 font-medium">
+        {item}
+      </motion.p>
+    )}
 
-type MenuItemProps = {
-  setActive: (item: string) => void;
-  active: string | null;
-  item: string;
-  children?: React.ReactNode;
-  link?: string;
-};
-
-const MenuItem = ({ setActive, active, item, children, link }: MenuItemProps) => {
-  return (
-    <div onMouseEnter={() => setActive(item)} className="relative cursor-pointer">
-      {link ? (
-        <Link
-          href={link}
-          className="text-black dark:text-white hover:text-red-500 font-medium"
-        >
-          {item}
-        </Link>
-      ) : (
-        <motion.p
-          transition={{ duration: 0.25 }}
-          className="text-black dark:text-white hover:text-red-500 font-medium"
-        >
-          {item}
-        </motion.p>
-      )}
-
-      {active === item && children && (
+    {active === item && children && (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={transition}
+        className="absolute top-[calc(100%+0.5rem)] left-1/2 transform -translate-x-1/2 z-50"
+      >
         <motion.div
-          initial={{ opacity: 0, scale: 0.85, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={transition}
-          className="absolute top-[calc(100%+0.5rem)] left-1/2 transform -translate-x-1/2 z-50"
+          layoutId="active"
+          className="bg-white dark:bg-black backdrop-blur-md rounded-2xl border border-black/20 dark:border-white/20 shadow-lg"
         >
-          <motion.div
-            layoutId="active"
-            className="bg-white dark:bg-black backdrop-blur-md rounded-2xl border border-black/20 dark:border-white/20 shadow-lg"
-          >
-            <motion.div layout className="w-max h-full p-3">
-              {children}
-            </motion.div>
-          </motion.div>
+          <motion.div layout className="w-max h-full p-3">{children}</motion.div>
         </motion.div>
-      )}
-    </div>
-  );
-};
+      </motion.div>
+    )}
+  </div>
+);
 
-const Menu = ({
-  setActive,
-  children,
-}: {
-  setActive: (item: string | null) => void;
-  children: React.ReactNode;
-}) => {
-  return (
-    <div className="flex items-center space-x-6" onMouseLeave={() => setActive(null)}>
-      {children}
-    </div>
-  );
-};
+const Menu = ({ setActive, children }: { setActive: (item: string | null) => void; children: React.ReactNode; }) => (
+  <div className="flex items-center space-x-6" onMouseLeave={() => setActive(null)}>{children}</div>
+);
 
-const ProductItem = ({
-  title,
-  description,
-  href,
-  src,
-}: {
-  title: string;
-  description: string;
-  href: string;
-  src: string;
-}) => {
-  return (
-    <a
-      href={href}
-      className="flex space-x-2 hover:opacity-90 rounded-md p-1 transition-all duration-200"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <img src={src} width={80} height={40} alt={title} className="rounded-md" />
-      <div>
-        <h4 className="font-semibold text-black dark:text-white text-sm">{title}</h4>
-        <p className="text-xs text-gray-600 dark:text-gray-300">{description}</p>
-      </div>
-    </a>
-  );
-};
+const ProductItem = ({ title, description, href, src }: { title: string; description: string; href: string; src: string; }) => (
+  <a href={href} className="flex space-x-2 hover:opacity-90 rounded-md p-1 transition-all duration-200" target="_blank" rel="noopener noreferrer">
+    <img src={src} width={80} height={40} alt={title} className="rounded-md" />
+    <div>
+      <h4 className="font-semibold text-black dark:text-white text-sm">{title}</h4>
+      <p className="text-xs text-gray-600 dark:text-gray-300">{description}</p>
+    </div>
+  </a>
+);

@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavbarDemo from "@/src/Components/shared/navbar-menu";
+import { HeroSectionOne } from "@/src/Components/Hero/page";
+import { Footer } from "@/src/Components/shared/footer";
+
 
 
 const geistSans = Geist({
@@ -27,10 +30,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-gray-900`}
       >
-        <NavbarDemo></NavbarDemo>
-        {children}
+        {/* Navbar উপরে fixed */}
+        <NavbarDemo />
+
+        {/* HeroBanner নিচে */}
+        <div className="mt-20 px-4">
+        <HeroSectionOne></HeroSectionOne>
+        </div>
+
+        {/* অন্যান্য page content */}
+        <main className="mt-10 px-4">{children}</main>
+
+        <Footer></Footer>
       </body>
     </html>
   );
