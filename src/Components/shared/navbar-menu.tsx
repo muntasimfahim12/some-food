@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, Transition } from "framer-motion";
 import Link from "next/link";
 
 // ========================
@@ -18,7 +18,7 @@ export default function NavbarDemo() {
   return (
     <div className="relative w-full min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
-      <main className="flex flex-col items-center justify-center mt-40 text-center px-4">
+      <main className="flex flex-col items-center justify-center mt-32 text-center px-4">
         <h1 className="text-3xl font-bold text-black dark:text-white mb-4">
           Welcome to SomeFood
         </h1>
@@ -46,30 +46,20 @@ function Navbar() {
   };
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 px-4 py-4">
-      <nav className="w-full max-w-7xl mx-auto flex justify-between items-center bg-white dark:bg-black shadow-lg rounded-full px-8 py-4">
+    <div className="fixed inset-x-0 top-0 z-50 px-4 py-2">
+      <nav className="w-full max-w-7xl mx-auto flex justify-between items-center bg-white dark:bg-black shadow-md rounded-full px-6 py-3">
         {/* Branding */}
         <div className="text-2xl font-extrabold text-red-500 dark:text-red-400">
           <Link href="/">SomeFood</Link>
         </div>
 
         {/* Menu */}
-        <div className="flex items-center space-x-8">
+        <div className="flex items-center space-x-6">
           <Menu setActive={setActive}>
-            <MenuItem
-              setActive={setActive}
-              active={active}
-              item="Home"
-              link="/"
-            />
-            <MenuItem
-              setActive={setActive}
-              active={active}
-              item="Profile"
-              link="/profile"
-            />
+            <MenuItem setActive={setActive} active={active} item="Home" link="/" />
+            <MenuItem setActive={setActive} active={active} item="Profile" link="/profile" />
             <MenuItem setActive={setActive} active={active} item="Services">
-              <div className="flex flex-col space-y-2 text-sm">
+              <div className="flex flex-col space-y-2 text-sm p-2">
                 <Link href="/web-dev" className="hover:text-red-500">
                   Web Development
                 </Link>
@@ -79,7 +69,7 @@ function Navbar() {
               </div>
             </MenuItem>
             <MenuItem setActive={setActive} active={active} item="Products">
-              <div className="grid grid-cols-2 gap-6 p-4 text-sm">
+              <div className="grid grid-cols-2 gap-4 p-2 text-sm">
                 <ProductItem
                   title="Algochurn"
                   href="https://algochurn.com"
@@ -100,7 +90,7 @@ function Navbar() {
         {/* Login/Logout */}
         <button
           onClick={handleLoginLogout}
-          className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-sm text-black dark:text-white font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+          className="ml-4 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-sm text-black dark:text-white font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
         >
           {isLoggedIn ? userEmail + " (Logout)" : "Login"}
         </button>
@@ -112,7 +102,7 @@ function Navbar() {
 // ========================
 // Motion & Menu Components
 // ========================
-const transition = {
+const transition: Transition = {
   type: "spring",
   mass: 2,
   damping: 14,
@@ -131,12 +121,12 @@ type MenuItemProps = {
 
 const MenuItem = ({ setActive, active, item, children, link }: MenuItemProps) => {
   return (
-    <div
-      onMouseEnter={() => setActive(item)}
-      className="relative cursor-pointer"
-    >
+    <div onMouseEnter={() => setActive(item)} className="relative cursor-pointer">
       {link ? (
-        <Link href={link} className="text-black dark:text-white hover:text-red-500 font-medium">
+        <Link
+          href={link}
+          className="text-black dark:text-white hover:text-red-500 font-medium"
+        >
           {item}
         </Link>
       ) : (
@@ -157,9 +147,11 @@ const MenuItem = ({ setActive, active, item, children, link }: MenuItemProps) =>
         >
           <motion.div
             layoutId="active"
-            className="bg-white dark:bg-black backdrop-blur-md rounded-2xl border border-black/20 dark:border-white/20 shadow-xl"
+            className="bg-white dark:bg-black backdrop-blur-md rounded-2xl border border-black/20 dark:border-white/20 shadow-lg"
           >
-            <motion.div layout className="w-max h-full p-4">{children}</motion.div>
+            <motion.div layout className="w-max h-full p-3">
+              {children}
+            </motion.div>
           </motion.div>
         </motion.div>
       )}
@@ -195,12 +187,14 @@ const ProductItem = ({
   return (
     <a
       href={href}
-      className="flex space-x-2 hover:opacity-90 rounded-md p-2 transition-all duration-200"
+      className="flex space-x-2 hover:opacity-90 rounded-md p-1 transition-all duration-200"
+      target="_blank"
+      rel="noopener noreferrer"
     >
-      <img src={src} width={90} height={45} alt={title} className="rounded-md" />
+      <img src={src} width={80} height={40} alt={title} className="rounded-md" />
       <div>
-        <h4 className="font-semibold text-black dark:text-white">{title}</h4>
-        <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
+        <h4 className="font-semibold text-black dark:text-white text-sm">{title}</h4>
+        <p className="text-xs text-gray-600 dark:text-gray-300">{description}</p>
       </div>
     </a>
   );
