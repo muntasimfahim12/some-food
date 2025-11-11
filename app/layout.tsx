@@ -7,8 +7,6 @@ import { Footer } from "@/src/Components/shared/footer";
 import { FoodCard } from "@/src/Components/Pages/FoodCard/page";
 import AboutPage from "@/src/Components/Pages/About/Page";
 
-
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -57,12 +55,10 @@ export default function RootLayout({
 
         {/* Main content area */}
         <main className="mt-10 px-4 space-y-20">
-          
           {/* Children pages */}
           {children}
 
-          <AboutPage></AboutPage>
-         
+          <AboutPage />
         </main>
 
         {/* Footer */}

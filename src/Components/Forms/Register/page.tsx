@@ -2,21 +2,47 @@
 
 import React, { useState } from "react";
 
-export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
+interface RegisterFormProps {
+  onSwitch: () => void;
+  onSuccess?: () => void; // optional callback
+}
+
+export default function RegisterForm({ onSwitch, onSuccess }: RegisterFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Registered as: ${name}`);
-  }
+    setLoading(true);
+    setError("");
+
+    // frontend-only simulation
+    setTimeout(() => {
+      setLoading(false);
+      if (name && email && password) {
+        alert(`Registration successful! Welcome ${name}`);
+        onSuccess?.();
+        onSwitch(); // switch to login form
+      } else {
+        setError("Please fill in all fields");
+      }
+    }, 1000);
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">Create Account</h2>
-      <p className="text-sm text-center text-gray-600 dark:text-gray-400 mb-4">Join SomeFood today!</p>
+      <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">
+        Create Account
+      </h2>
+      <p className="text-sm text-center text-gray-600 dark:text-gray-400 mb-4">
+        Join SomeFood today!
+      </p>
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <div>
         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
@@ -61,8 +87,12 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
         </button>
       </div>
 
-      <button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-medium">
-        Register
+      <button
+        type="submit"
+        className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-medium"
+        disabled={loading}
+      >
+        {loading ? "Registering..." : "Register"}
       </button>
 
       <p className="text-center text-sm text-gray-600 dark:text-gray-400">
