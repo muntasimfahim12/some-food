@@ -5,7 +5,9 @@ import NavbarDemo from "@/src/Components/shared/navbar-menu";
 import { HeroSectionOne } from "@/src/Components/Hero/page";
 import { Footer } from "@/src/Components/shared/footer";
 import { FoodCard } from "@/src/Components/Pages/FoodCard/page";
- // Make sure path is correct
+import AboutPage from "@/src/Components/Pages/About/Page";
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,15 +48,22 @@ export default function RootLayout({
             Our Delicious Menu
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            <FoodCard></FoodCard>
+            <FoodCard />
             <FoodCard />
             <FoodCard />
             <FoodCard />
           </div>
         </section>
 
-        {/* Other page content */}
-        <main className="mt-10 px-4">{children}</main>
+        {/* Main content area */}
+        <main className="mt-10 px-4 space-y-20">
+          
+          {/* Children pages */}
+          {children}
+
+          <AboutPage></AboutPage>
+         
+        </main>
 
         {/* Footer */}
         <Footer />

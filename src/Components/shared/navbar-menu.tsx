@@ -3,6 +3,9 @@
 import React, { useState } from "react";
 import { motion, Transition } from "framer-motion";
 import Link from "next/link";
+import RegisterForm from "../Forms/Register/page";
+import LoginForm from "../Forms/Login/page";
+
 
 const transition: Transition = {
   type: "spring",
@@ -25,74 +28,74 @@ export default function Navbar() {
   const [active, setActive] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const handleLoginLogout = () => {
     if (isLoggedIn) {
       setIsLoggedIn(false);
       setUserEmail("");
     } else {
-      setIsLoggedIn(true);
-      setUserEmail("user@example.com");
+      setShowAuthModal(true);
     }
   };
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 px-4 py-2">
-      <nav className="w-full max-w-7xl mx-auto flex justify-between items-center bg-white dark:bg-black shadow-md rounded-full px-6 py-3">
-        {/* Branding */}
-        <div className="text-2xl font-extrabold text-red-500 dark:text-red-400">
-          <Link href="/">SomeFood</Link>
-        </div>
+    <>
+      <div className="fixed inset-x-0 top-0 z-50 px-4 py-2">
+        <nav className="w-full max-w-7xl mx-auto flex justify-between items-center bg-white dark:bg-black shadow-md rounded-full px-6 py-3">
+          <div className="text-2xl font-extrabold text-red-500 dark:text-red-400">
+            <Link href="/">SomeFood</Link>
+          </div>
 
-        {/* Menu */}
-        <div className="flex items-center space-x-6">
-          <Menu setActive={setActive}>
-            <MenuItem setActive={setActive} active={active} item="Home" link="/" />
-            <MenuItem setActive={setActive} active={active} item="Profile" link="/profile" />
-            <MenuItem setActive={setActive} active={active} item="Services">
-              <div className="flex flex-col space-y-2 text-sm p-2">
-                <Link href="/web-dev" className="hover:text-red-500">Web Development</Link>
-                <Link href="/interface-design" className="hover:text-red-500">Interface Design</Link>
-              </div>
-            </MenuItem>
-            <MenuItem setActive={setActive} active={active} item="Products">
-              <div className="grid grid-cols-2 gap-4 p-2 text-sm">
-                <ProductItem
-                  title="Algochurn"
-                  href="https://algochurn.com"
-                  src="https://assets.aceternity.com/demos/algochurn.webp"
-                  description="Prepare for tech interviews"
-                />
-                <ProductItem
-                  title="Tailwind Kit"
-                  href="https://tailwindmasterkit.com"
-                  src="https://assets.aceternity.com/demos/tailwindmasterkit.webp"
-                  description="Ready Tailwind components"
-                />
-              </div>
-            </MenuItem>
-          </Menu>
-        </div>
+          <div className="flex items-center space-x-6">
+            <Menu setActive={setActive}>
+              <MenuItem setActive={setActive} active={active} item="Home" link="/" />
+              <MenuItem setActive={setActive} active={active} item="Profile" link="/profile" />
+              <MenuItem setActive={setActive} active={active} item="Services">
+                <div className="flex flex-col space-y-2 text-sm p-2">
+                  <Link href="/web-dev" className="hover:text-red-500">Web Development</Link>
+                  <Link href="/interface-design" className="hover:text-red-500">Interface Design</Link>
+                </div>
+              </MenuItem>
+            </Menu>
+          </div>
 
-        {/* Login/Logout */}
-        <button
-          onClick={handleLoginLogout}
-          className="ml-4 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-sm text-black dark:text-white font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-        >
-          {isLoggedIn ? userEmail + " (Logout)" : "Login"}
-        </button>
-      </nav>
-    </div>
+          <button
+            onClick={handleLoginLogout}
+            className="ml-4 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-sm text-black dark:text-white font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+          >
+            {isLoggedIn ? `${userEmail} (Logout)` : "Login"}
+          </button>
+        </nav>
+      </div>
+
+      {/* Modal */}
+      {showAuthModal && (
+        <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl w-full max-w-md p-6 relative">
+            <button
+              onClick={() => setShowAuthModal(false)}
+              className="absolute top-3 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400"
+            >
+              ✖
+            </button>
+            {isRegistering ? (
+             <RegisterForm onSwitch={() => setIsRegistering(false)}></RegisterForm>
+            ) : (
+              <LoginForm onSwitch={() => setIsRegistering(true)} ></LoginForm>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
 const MenuItem = ({ setActive, active, item, children, link }: MenuItemProps) => (
   <div onMouseEnter={() => setActive(item)} className="relative cursor-pointer">
     {link ? (
-      <Link
-        href={link}
-        className="text-black dark:text-white hover:text-red-500 font-medium"
-      >
+      <Link href={link} className="text-black dark:text-white hover:text-red-500 font-medium">
         {item}
       </Link>
     ) : (
@@ -119,16 +122,6 @@ const MenuItem = ({ setActive, active, item, children, link }: MenuItemProps) =>
   </div>
 );
 
-const Menu = ({ setActive, children }: { setActive: (item: string | null) => void; children: React.ReactNode; }) => (
+const Menu = ({ setActive, children }: { setActive: (item: string | null) => void; children: React.ReactNode }) => (
   <div className="flex items-center space-x-6" onMouseLeave={() => setActive(null)}>{children}</div>
-);
-
-const ProductItem = ({ title, description, href, src }: { title: string; description: string; href: string; src: string; }) => (
-  <a href={href} className="flex space-x-2 hover:opacity-90 rounded-md p-1 transition-all duration-200" target="_blank" rel="noopener noreferrer">
-    <img src={src} width={80} height={40} alt={title} className="rounded-md" />
-    <div>
-      <h4 className="font-semibold text-black dark:text-white text-sm">{title}</h4>
-      <p className="text-xs text-gray-600 dark:text-gray-300">{description}</p>
-    </div>
-  </a>
 );
