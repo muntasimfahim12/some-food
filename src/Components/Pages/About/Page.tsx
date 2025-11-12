@@ -2,15 +2,10 @@
 
 import { motion } from "framer-motion";
 
-
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Navbar */}
-    
-
-      {/* Hero Section */}
-      <section className="relative mx-auto mt-24 max-w-7xl px-4 py-16 flex flex-col items-center justify-center text-center">
+    <section id="about" className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="relative mx-auto mt-24 max-w-7xl px-4 py-16 flex flex-col items-center justify-center text-center">
         <h1 className="text-4xl md:text-6xl font-bold text-red-600 dark:text-red-400 mb-6">
           About SomeFood
         </h1>
@@ -65,9 +60,7 @@ export default function AboutPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent" />
         </motion.div>
-      </section>
-
-    
-    </div>
+      </div>
+    </section>
   );
 }

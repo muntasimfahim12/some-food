@@ -3,6 +3,9 @@
 import React, { useState } from "react";
 import { motion, Transition } from "framer-motion";
 import Link from "next/link";
+import { useUser, useClerk } from "@clerk/nextjs";
+import LoginForm from "@/src/Components/Forms/Login/page";
+import RegisterForm from "@/src/Components/Forms/Register/page";
 
 const transition: Transition = {
   type: "spring",
@@ -21,66 +24,154 @@ type MenuItemProps = {
   link?: string;
 };
 
-export default function Navbar() {
+export default function NavbarDemo() {
+  const { user, isSignedIn } = useUser();
+  const { signOut } = useClerk();
   const [active, setActive] = useState<string | null>(null);
 
+  // Mobile menu state
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Modal state
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+
+  // Smooth scroll
+  const handleScroll = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+    setMobileOpen(false); // close mobile menu
+  };
+
+  const menuItems = [
+    { item: "Home", id: "hero" },
+    { item: "About", id: "about" },
+    { item: "Menu", id: "menu" },
+    { item: "Contact", id: "contact" },
+  ];
+
   return (
-    <div className="fixed inset-x-0 top-0 z-50 px-4">
-      <nav className="w-full max-w-7xl mx-auto flex justify-between items-center bg-white dark:bg-black shadow-md rounded-full px-6 py-3">
+    <div className="fixed inset-x-0 top-0 z-50 px-4 bg-white dark:bg-black shadow-md rounded-full">
+      <nav className="w-full max-w-7xl mx-auto flex justify-between items-center px-6 py-3">
+        {/* Logo */}
         <div className="text-2xl font-extrabold text-red-500 dark:text-red-400">
           <Link href="/">SomeFood</Link>
         </div>
 
-        <div className="flex items-center space-x-6">
-          <Menu setActive={setActive}>
-            <MenuItem setActive={setActive} active={active} item="Home" link="/" />
-            <MenuItem setActive={setActive} active={active} item="About" link="/about" />
-            <MenuItem setActive={setActive} active={active} item="Menu" link="/menu" />
-            <MenuItem setActive={setActive} active={active} item="Contact" link="/contact" />
-          </Menu>
+        {/* Desktop Menu */}
+        <div className="hidden md:flex items-center space-x-6">
+          {menuItems.map(({ item, id }) => (
+            <button
+              key={id}
+              onClick={() => handleScroll(id)}
+              className="text-black dark:text-white hover:text-red-500 font-medium"
+            >
+              {item}
+            </button>
+          ))}
+
+          {!isSignedIn ? (
+            <>
+              <button
+                onClick={() => { setShowAuthModal(true); setIsRegistering(false); }}
+                className="px-4 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => { setShowAuthModal(true); setIsRegistering(true); }}
+                className="px-4 py-1 rounded-lg border border-red-600 hover:bg-red-600 hover:text-white text-red-600 font-medium"
+              >
+                Register
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-black dark:text-white font-semibold">
+                {user?.firstName?.[0] || "U"}
+              </div>
+              <button
+                onClick={() => signOut()}
+                className="px-3 py-1 rounded-lg border border-red-600 hover:bg-red-600 hover:text-white text-red-600 font-medium"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <button onClick={() => setMobileOpen(!mobileOpen)}>
+            <span className="text-2xl">{mobileOpen ? "✖" : "☰"}</span>
+          </button>
         </div>
       </nav>
+
+      {/* Mobile Menu */}
+      {mobileOpen && (
+        <div className="md:hidden bg-white dark:bg-black px-6 py-4 flex flex-col space-y-3">
+          {menuItems.map(({ item, id }) => (
+            <button
+              key={id}
+              onClick={() => handleScroll(id)}
+              className="text-black dark:text-white hover:text-red-500 font-medium text-left"
+            >
+              {item}
+            </button>
+          ))}
+
+          {!isSignedIn ? (
+            <>
+              <button
+                onClick={() => { setShowAuthModal(true); setIsRegistering(false); setMobileOpen(false); }}
+                className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => { setShowAuthModal(true); setIsRegistering(true); setMobileOpen(false); }}
+                className="px-4 py-2 rounded-lg border border-red-600 hover:bg-red-600 hover:text-white text-red-600 font-medium"
+              >
+                Register
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-black dark:text-white font-semibold">
+                {user?.firstName?.[0] || "U"}
+              </div>
+              <button
+                onClick={() => { signOut(); setMobileOpen(false); }}
+                className="px-3 py-1 rounded-lg border border-red-600 hover:bg-red-600 hover:text-white text-red-600 font-medium"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl w-full max-w-md p-6 relative">
+            <button
+              onClick={() => setShowAuthModal(false)}
+              className="absolute top-3 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400"
+            >
+              ✖
+            </button>
+            {isRegistering ? (
+              <RegisterForm onSwitch={() => setIsRegistering(false)} />
+            ) : (
+              <LoginForm onSwitch={() => setIsRegistering(true)} />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-const MenuItem = ({ setActive, active, item, children, link }: MenuItemProps) => (
-  <div onMouseEnter={() => setActive(item)} className="relative cursor-pointer">
-    {link ? (
-      <Link href={link} className="text-black dark:text-white hover:text-red-500 font-medium">
-        {item}
-      </Link>
-    ) : (
-      <motion.p
-        transition={{ duration: 0.25 }}
-        className="text-black dark:text-white hover:text-red-500 font-medium"
-      >
-        {item}
-      </motion.p>
-    )}
-
-    {active === item && children && (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.85, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={transition}
-        className="absolute top-[calc(100%+0.5rem)] left-1/2 transform -translate-x-1/2 z-50"
-      >
-        <motion.div
-          layoutId="active"
-          className="bg-white dark:bg-black backdrop-blur-md rounded-2xl border border-black/20 dark:border-white/20 shadow-lg"
-        >
-          <motion.div layout className="w-max h-full p-3">{children}</motion.div>
-        </motion.div>
-      </motion.div>
-    )}
-  </div>
-);
-
-const Menu = ({
-  setActive,
-  children,
-}: {
-  setActive: (item: string | null) => void;
-  children: React.ReactNode;
-}) => <div className="flex items-center space-x-6" onMouseLeave={() => setActive(null)}>{children}</div>;
